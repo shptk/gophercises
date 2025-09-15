@@ -19,7 +19,6 @@ func main() {
 	csv_data, err := csv_reader.ReadAll()
 	correct := 0
 	total := len(csv_data)
-	var user_input string
 	if err == io.EOF {
 		return
 	}
@@ -35,6 +34,8 @@ quizloop:
 
 		fmt.Print(row_value[0], ": ")
 		go func() {
+
+			var user_input string
 			fmt.Scanln(&user_input)
 			answerCh <- user_input
 		}()
