@@ -2,14 +2,21 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"time"
 )
 
 func main() {
+	var t_limit int
+	flag.IntVar(&t_limit, "timeout",30,"pass a timeout in sec")
+	flag.Parse()
+	timeout := time.NewTimer(time.Duration(t_limit) * time.Second)
+	
 	f, err := os.Open("problems.csv")
 	if err != nil {
 		log.Fatal(err)
@@ -26,7 +33,7 @@ func main() {
 		log.Fatal(err)
 
 	}
-	timer := time.NewTimer(15 * time.Second)
+	rand.Shuffle(total, func(i, j int) {csv_data[i], csv_data[j] = csv_data[j], csv_data[i]})
 	answerCh := make(chan string)
 quizloop:
 	for _, row_value := range csv_data {
@@ -41,7 +48,7 @@ quizloop:
 		}()
 
 		select {
-		case <-timer.C:
+		case <-timeout.C:
 			break quizloop
 		case user_input := <-answerCh:
 			if user_input == row_value[1] {
